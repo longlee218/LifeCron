@@ -5,5 +5,8 @@ module.exports = {
     es2021: true,
   },
   extends: ['standard'],
-  rules: {},
+  rules: {
+    "semi": ["error", "always"],
+    "quotes": ["error", "double"]
+  },
 };

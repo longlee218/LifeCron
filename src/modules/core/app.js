@@ -1,7 +1,6 @@
 const express = require('express');
-const path = require('path');
 
-const createServerApp = () => {
+const createServerApp = async () => {
   const app = express();
   app.enable('trust proxy');
   return app;

@@ -1,51 +1,42 @@
-require('dotenv').config();
-const { createServerApp } = require('./app');
 const http = require('http');
-const { log, error } = require('console');
-const { ApolloServer } = require('apollo-server-express');
-const { ApolloServerPluginDrainHttpServer } = require('apollo-server-core');
+// const fs = require('fs');
+// const path = require('path');
+const createApolloServer = require('./graphql');
+const { createServerApp } = require('./app');
+const { Logger } = require('./logger');
 const { exit } = require('process');
 const { createSchema } = require('./api/schema');
-const path = require('path');
-const fs = require('fs');
-
+const Environment = require('./environment');
 
 let httpServer = undefined;
-
-const serverPort = process.env.PORT || 3000;
+const serverPort = Environment.getConfig().server.port;
+const log = Logger("modules:core:server");
 
 const createServer = async () => {
-    const dirs = fs.readdirSync(path.join(__dirname, '../')).filter(folder => folder !== 'core');
-    console.log(dirs);
+    // const dirs = fs.readdirSync(path.join(__dirname, '../')).filter(folder => folder !== 'core');
     try {
         if (!httpServer) {
-            const app = createServerApp();
+
+            // Start app with express server
+            const app = await createServerApp();
+
+            // Start http server with express server
             httpServer = http.createServer(app);
 
+            // Start apollo server
             const schema = createSchema();
+            const graphqlServer = createApolloServer(schema, httpServer);
+            await graphqlServer.start();
+            graphqlServer.applyMiddleware({ app });
 
-            const apolloServer = new ApolloServer({
-                schema: schema,
-                plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-            });
 
-            await apolloServer.start();
-
-            apolloServer.applyMiddleware({ app });
-
-            httpServer.listen(serverPort, () => {
-                log(`🚀 Server ready at http://localhost:${serverPort}${apolloServer.graphqlPath}`);
-            });
-
-            httpServer.on('close', () => {
-                httpServer = undefined;
-            });
-        } else {
-            const schema = createSchema();
+            httpServer.listen(serverPort, () => log.error(`🚀 Server ready at ${serverPort}${graphqlServer.graphqlPath}`));
+            httpServer.on('close', () => httpServer = undefined);
         }
     } catch (err) {
-        error(err);
+        log.error(err);
         exit(1);
     }
 };
+
 module.exports = { createServer };

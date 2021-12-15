@@ -1,3 +1,7 @@
-const { server } = require('./modules/core');
+require('dotenv').config();
+const { server, db, Logger } = require('./modules/core');
 
-Promise.resolve(server.createServer()).catch((error) => console.log(error));
+const log = Logger("start app");
+Promise.resolve(db())
+    .then(server.createServer())
+    .catch((error) => log.error(error));
