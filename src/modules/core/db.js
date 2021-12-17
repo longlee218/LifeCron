@@ -4,6 +4,7 @@ const { Logger } = require('./logger');
 
 const log = Logger("modules:core:db");
 const uri = Environment.getConfig().database.connection;
-log.error('Connect to Mongodb...');
 
-module.exports = () => mongoose.connect(uri);
+log.info('Connecting to Mongodb...');
+const connect = () => mongoose.connect(uri)
+module.exports = { connect };

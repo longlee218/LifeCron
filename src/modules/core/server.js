@@ -1,36 +1,31 @@
 const http = require('http');
-// const fs = require('fs');
-// const path = require('path');
+const fs = require('fs');
+const path = require('path');
 const createApolloServer = require('./graphql');
+const Environment = require('./environment');
+const { exit } = require('process');
 const { createServerApp } = require('./app');
 const { Logger } = require('./logger');
-const { exit } = require('process');
 const { createSchema } = require('./api/schema');
-const Environment = require('./environment');
 
 let httpServer = undefined;
 const serverPort = Environment.getConfig().server.port;
-const log = Logger("modules:core:server");
 
+const log = Logger("modules:core:server");
 const createServer = async () => {
-    // const dirs = fs.readdirSync(path.join(__dirname, '../')).filter(folder => folder !== 'core');
+    // Fractal object
+    const modules = fs.readdirSync(path.join(__dirname, '../')).filter(folder => folder !== 'core');
     try {
         if (!httpServer) {
-
-            // Start app with express server
             const app = await createServerApp();
-
-            // Start http server with express server
             httpServer = http.createServer(app);
-
-            // Start apollo server
-            const schema = createSchema();
-            const graphqlServer = createApolloServer(schema, httpServer);
+            const { schema, accountsGraphQL } = await createSchema();
+            const graphqlServer = createApolloServer(schema, accountsGraphQL, httpServer);
             await graphqlServer.start();
             graphqlServer.applyMiddleware({ app });
 
-
-            httpServer.listen(serverPort, () => log.error(`🚀 Server ready at ${serverPort}${graphqlServer.graphqlPath}`));
+            await new Promise(resolve => httpServer.listen({ port: serverPort }, resolve));
+            log.info(`🚀 Server ready at http://127.0.0.1:${serverPort}${graphqlServer.graphqlPath}`)
             httpServer.on('close', () => httpServer = undefined);
         }
     } catch (err) {

@@ -1,18 +1,13 @@
 const { gql } = require('apollo-server-express');
-const { makeExecutableSchema } = require('graphql-tools');
+const { makeExecutableSchema } = require('@graphql-tools/schema');
+const { authenticateJWT } = require('../../authentication');
+const { mergeResolvers, mergeTypeDefs } = require('@graphql-tools/merge');
 
 const typeDefs = gql`
-  # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
-
-  # This 'Book' type defines the queryable fields for every book in our data source.
   type Book {
     title: String
     author: String
   }
-
-  # The 'Query' type is special: it lists all of the available queries that
-  # clients can execute, along with the return type for each. In this
-  # case, the 'books' query returns an array of zero or more Books (defined above).
   type Query {
     books: [Book]
   }
@@ -28,18 +23,19 @@ const books = [
     },
 ];
 
-// Resolvers define the technique for fetching the types defined in the
-// schema. This resolver retrieves books from the 'books' array above.
 const resolvers = {
     Query: {
         books: () => books,
     },
 };
 
-const createSchema = () =>
-    makeExecutableSchema({
-        typeDefs: typeDefs,
-        resolvers: resolvers,
+const createSchema = async () => {
+    const authenticate = await authenticateJWT();
+    const schema = makeExecutableSchema({
+        typeDefs: mergeTypeDefs([typeDefs, authenticate.typeDefs]),
+        resolvers: mergeResolvers([authenticate.resolvers, resolvers]),
     });
+    return { schema, accountsGraphQL: authenticate };
+}
 
 module.exports = { createSchema };

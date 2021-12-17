@@ -1,5 +1,5 @@
 module.exports = {
   server: require('./server'),
-  db: require('./db'),
+  database: require('./db'),
   Logger: require('./logger').Logger
 };

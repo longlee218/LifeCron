@@ -15,7 +15,7 @@ module.exports = {
         logger: {
             debug: 'app*',
             console: {
-                level: 'error'
+                level: 'info'
             }
         }
     },

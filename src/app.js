@@ -1,7 +1,7 @@
 require('dotenv').config();
-const { server, db, Logger } = require('./modules/core');
+const { server, database, Logger } = require('./modules/core');
 
 const log = Logger("start app");
-Promise.resolve(db())
+Promise.resolve(database.connect())
     .then(server.createServer())
-    .catch((error) => log.error(error));
+    .catch((error) => log.error("This is bug: ", error));

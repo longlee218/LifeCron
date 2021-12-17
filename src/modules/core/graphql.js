@@ -1,12 +1,11 @@
 const { ApolloServer, AuthenticationError } = require('apollo-server-express');
 const { ApolloServerPluginDrainHttpServer } = require('apollo-server-core');
 
-module.exports = (schema, httpServer) => {
+module.exports = (schema, accountsGraphQL, httpServer) => {
     return new ApolloServer({
         schema: schema,
         context: async (req, res) => ({
-            req,
-            res
+            ...(await accountsGraphQL.context(req)),
         }),
         formatError: (error) =>
             error.message === 'Not Authenticated'
