@@ -1,7 +1,19 @@
-require('dotenv').config();
-const { server, database, Logger } = require('./modules/core');
+require("dotenv").config();
+const {server, Logger} = require("./modules/core");
+const mongoose = require("mongoose");
+const Environment = require("./modules/core/environment");
 
-const log = Logger.Logger("start app");
-Promise.resolve(() => database.connect())
-    .then(() => server.createServer())
-    .catch((error) => log.error("This is bug: ", error));
+const uri = Environment.getConfig().database.connection;
+
+mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}, async (error) => {
+    if (error) {
+        console.log("ERROR: ", error);
+    } else {
+        const log = Logger.Logger("mongodb");
+        log.info("Connect success at: " + uri)
+        await server.createServer()
+    }
+})

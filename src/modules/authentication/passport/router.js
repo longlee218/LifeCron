@@ -14,10 +14,9 @@ const {
     getToken
 }  = require("./controller")
 
-
 router.post("/signup", validateSignUp, signUp);
 
-router.post("/login", validateSignIn, signIn);
+router.post("/signin", validateSignIn, signIn);
 
 router.get("/verify/:email/:token", verifyEmail);
 
