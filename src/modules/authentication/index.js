@@ -1,11 +1,9 @@
-const { AccountsModule } = require('@accounts/graphql-api');
-const accountServerJWT = require('./access/jwt')
-
-const authenticateJWT = async () => {
-    const accountsServer = await accountServerJWT();
-    return AccountsModule.forRoot({ accountsServer });
-}
+const {authenticateAccountJSJWT} = require("./accoutjs");
+const passportRouter = require("./passport/router");
+const {applyPassportStrategy} = require("./passport/service");
 
 module.exports = {
-    authenticateJWT
+    authenticateAccountJSJWT,             //  using with GraphQL Apollo
+    applyPassportStrategy,
+    router: passportRouter
 }

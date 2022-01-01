@@ -1,6 +1,6 @@
 const { gql } = require('apollo-server-express');
 const { makeExecutableSchema } = require('@graphql-tools/schema');
-const { authenticateJWT } = require('../../authentication');
+const { authenticateAccountJSJWT } = require('../../authentication');
 const { mergeResolvers, mergeTypeDefs } = require('@graphql-tools/merge');
 
 const typeDefs = gql`
@@ -30,7 +30,7 @@ const resolvers = {
 };
 
 const createSchema = async () => {
-    const authenticate = await authenticateJWT();
+    const authenticate = await authenticateAccountJSJWT();
     const schema = makeExecutableSchema({
         typeDefs: mergeTypeDefs([typeDefs, authenticate.typeDefs]),
         resolvers: mergeResolvers([authenticate.resolvers, resolvers]),

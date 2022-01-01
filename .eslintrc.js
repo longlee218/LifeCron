@@ -4,7 +4,7 @@ module.exports = {
     commonjs: true,
     es2021: true,
   },
-  extends: ['standard'],
+  extends: 'standard',
   rules: {
     "semi": ["error", "always"],
     "quotes": ["error", "double"]
