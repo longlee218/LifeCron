@@ -1,15 +1,16 @@
-const mongoose = require('mongoose');
 const crypto = require('crypto');
+const mongoose = require('mongoose');
+const {Schema} = mongoose;
+const {String, Boolean, Date} = Schema.Types;
 
-const { Schema } = mongoose;
 const authUserSchema = new Schema({
-    password: { type: String, require: true },
+    password: {type: String, require: true},
     last_login: Date,
-    email: { type: String, require: true },
-    is_active: { type: Boolean, require: true, default: false },
-    date_joined: { type: Date, require: true },
+    email: {type: String, require: true},
+    is_active: {type: Boolean, require: true, default: false},
+    date_joined: {type: Date, require: true},
     salt: String,
-}, { timestamps: { createdAt: true, updatedAt: true } });
+}, {timestamps: {createdAt: true, updatedAt: true}});
 
 authUserSchema.statics.setPassword = (password) => {
     const salt = crypto.randomBytes(16).toString('hex');

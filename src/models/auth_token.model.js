@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
-const { Schema, Types } = mongoose;
+const {Schema} = mongoose;
+const {ObjectId, String, Boolean, Date} = Schema.Types;
 
 const authTokenSchema = new Schema({
-    user: { type: Types.ObjectId, require: true, ref: 'auth_users' },
-    access_token: { type: String, require: true },
-    refresh_token: { type: String, require: true },
+    user: {type: ObjectId, require: true, ref: "auth_user"},
+    access_token: String,
+    refresh_token: String,
     is_active: Boolean,
     expires_in: Date
-}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
+}, {timestamps: {createdAt: true, updatedAt: true}});
 
 const AuthToken = mongoose.model('auth_token', authTokenSchema);
 module.exports = AuthToken;

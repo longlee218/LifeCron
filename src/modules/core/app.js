@@ -6,7 +6,6 @@ const passport = require('passport');
 const bodyParser = require('body-parser');
 const {applyPassportStrategy} = require('../authentication');
 const {GoogleStrategy, GithubStrategy} = require('../authentication/passport/social');
-const {resServerError} = require("../../utils/response");
 
 exports.createServerApp = () => {
     const app = express();
@@ -41,7 +40,7 @@ exports.createServerApp = () => {
 
     app.use((error, req, res, next) => {
         if (error) {
-            resServerError(res, error.code, error.message, error);
+            res.status(500).json(error);
         } else {
             next();
         }

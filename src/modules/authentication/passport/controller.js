@@ -1,9 +1,15 @@
 const {AuthUser} = require("../../../models");
-const {makeAndStoreToken} = require("./service");
+const {makeAndStoreToken, makeOAuthUser} = require("./service");
 const {sendMailVerify} = require("../../mailer");
 const MyError = require("../../../utils/MyError");
 const {catchAsync} = require("../../../utils/catchAsync");
 const {resServerSuccess} = require('../../../utils').response;
+
+const sendMail = async (host, email, accessToken) => {
+    const link = `http://${host}/api/v1/verify/${email}/${accessToken}`;
+    await sendMailVerify(email, link);
+    return `Hệ thống đã gửi E-mail xác nhận tới địa chỉ: ${email}, và sẽ hết hạn sau 1 giờ. Nếu bạn chưa nhận được E-mail, hãy click vào đây để nhận lại.`;
+}
 
 exports.signUp = catchAsync(async (req, res, next) => {
     const {email, password} = req.body;
@@ -21,11 +27,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
         //Generate token
         const {accessToken} = await makeAndStoreToken({_id: user._id, email: user.email});
         //Send email
-        const host = req.get('host');
-        const link = `http://${host}/api/passport/verify/${email}/${accessToken}`;
-        await sendMailVerify(email, link);
-
-        const msg = `Hệ thống đã gửi E-mail xác nhận tới địa chỉ: ${email}, và sẽ hết hạn sau 1 giờ. Nếu bạn chưa nhận được E-mail, hãy click vào đây để nhận lại.`;
+        const msg = await sendMail(req.host, email, accessToken);
         await session.commitTransaction();
         session.endSession();
         return resServerSuccess(res, 200, msg);
@@ -84,22 +86,15 @@ exports.resendVerifyEmail = catchAsync(async (req, res, next) => {
     if (user.is_active) {
         throw new MyError("Tài khoản đã được xác thực.", 400);
     }
-    const {accessToken} = await makeAndStoreToken(
-        {
-            _id: user._id,
-            email: user.email,
-        });
-    const host = req.get('host');
-    const link = `http://${host}/api/passport/verify/${email}/${accessToken}`;
-    await sendMailVerify(email, link);
-    const msg = `Hệ thống đã gửi E-mail xác nhận tới địa chỉ: ${email}, và sẽ hết hạn sau 1 giờ. Nếu bạn chưa nhận được E-mail, hãy click vào đây để nhận lại.`;
+    const {accessToken} = await makeAndStoreToken({_id: user._id, email: user.email});
+    const msg = await sendMail(req.host, email, accessToken);
     return resServerSuccess(res, 200, msg, []);
 })
 
 exports.getToken = catchAsync(async (req, res, next) => {
     const authToken = await AuthToken.findOne({refresh_token: refreshToken});
     if (!authToken) {
-        throw new MyError("Token không hợp lệ.", 400);
+        throw new MyError("Token không hợp lệ.", 404);
     }
     const user = await AuthUser.findOne({_id: authToken.user, is_active: true});
 
@@ -109,7 +104,7 @@ exports.getToken = catchAsync(async (req, res, next) => {
     const {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken
-    } = await makeAndStoreToken({_id: user._id, email: user.email,});
+    } = await makeAndStoreToken({_id: user._id, email: user.email});
     user.password = undefined;
     return resServerSuccess(res, 200, "ok", {
         user,
@@ -118,4 +113,15 @@ exports.getToken = catchAsync(async (req, res, next) => {
             refreshToken: newRefreshToken
         }
     });
+});
+
+exports.makeOAuthUser = catchAsync(async (req, res, next) => {
+    const {user, accessToken, refreshToken} = await makeOAuthUser(req.user);
+    return resServerSuccess(res, 200, "ok", {
+        user,
+        token: {
+            accessToken,
+            refreshToken
+        }
+    })
 });

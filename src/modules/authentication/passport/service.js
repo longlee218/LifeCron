@@ -63,7 +63,7 @@ const makeOAuthUser = async (user) => {
         const {accessToken, refreshToken} = await makeAndStoreToken(infoInToken);
         return {user, accessToken, refreshToken};
     } else {
-        const [salt, passwordHash] = await AuthUser.setPassword(crypto.randomBytes(20).toString('hex'));
+        const {salt, passwordHash} = await AuthUser.setPassword(crypto.randomBytes(20).toString('hex'));
         const newUser = await AuthUser.create({
             username: user.displayName,
             email: user.email,
