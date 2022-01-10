@@ -1,8 +1,8 @@
-const passportConfig = require("./config");
-const {AuthUser, AuthToken} = require("../../../models");
 const crypto = require("crypto");
-const {ExtractJwt, Strategy} = require("passport-jwt");
 const jwt = require("jsonwebtoken");
+const passportConfig = require("./auth.config");
+const {ExtractJwt, Strategy} = require("passport-jwt");
+const {AuthUser, AuthToken} = require("../../models");
 
 
 const applyPassportStrategy = (passport) => {
@@ -43,7 +43,7 @@ const makeAndStoreToken = async (infoInToken) => {
     await AuthToken.create({
         access_token: accessToken,
         refresh_token: refreshToken,
-        user: infoInToken._id,
+        f_user: infoInToken._id,
         expire_in: now.setSeconds(now.getSeconds() + passportConfig.expiresIn)
     });
     return {accessToken, refreshToken};

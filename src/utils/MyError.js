@@ -1,12 +1,31 @@
-class MyError extends  Error {
-    constructor(message, code) {
-        super(message);
-        this.code = code;
-        this.status = code.toString().startsWith("4") ? "fail" : "error";
-        this.isOperational = true;
-
-        Error.captureStackTrace(this, this.constructor);
+class BaseError extends Error {
+    constructor({ message, isOperational, status = 500 }) {
+        super();
+        this.name = this.constructor.name;
+        this.message = message;
+        this.status = status;
+        this.isOperational = isOperational;
+        Error.captureStackTrace(this, this.constructor.name);
     }
 }
 
-module.exports = MyError;
+class APIError extends BaseError {
+    constructor({ message, errors, isOperational = true, status = 400 }) {
+        super({ message, status, isOperational });
+        this.errors = errors;
+    }
+}
+
+class ErrorHandler {
+    async handleError(error) { }
+
+    isTrustedError(error) {
+        if (error instanceof BaseError) {
+            return error.isOperational;
+        }
+        return false;
+    }
+}
+
+const errorHandler = new ErrorHandler();
+module.exports = { APIError, BaseError, errorHandler };

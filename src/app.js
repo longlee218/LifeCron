@@ -16,4 +16,4 @@ mongoose.connect(uri, {
         log.info("Connect success at: " + uri)
         await server.createServer()
     }
-})
+});

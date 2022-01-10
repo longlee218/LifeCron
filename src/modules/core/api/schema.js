@@ -1,6 +1,6 @@
 const { gql } = require('apollo-server-express');
 const { makeExecutableSchema } = require('@graphql-tools/schema');
-const { authenticateAccountJSJWT } = require('../../authentication');
+const { authenticateAccountJSJWT } = require('../../auth');
 const { mergeResolvers, mergeTypeDefs } = require('@graphql-tools/merge');
 
 const typeDefs = gql`

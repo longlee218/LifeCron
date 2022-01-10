@@ -1,17 +1,24 @@
 const winston = require('winston');
-const { combine, timestamp, simple, colorize } = winston.format;
+const {combine, timestamp, simple, colorize} = winston.format;
 const Debug = require('debug');
 const Environment = require('./environment');
 
 const logger = winston.createLogger({
     format: combine(
-        timestamp(),
-        colorize()
+        // timestamp(),
+        // colorize()
+        winston.format.timestamp({format: 'YYYY-MM-DD HH:mm:ss:ms'}),
+        winston.format.colorize({all: true}),
+        winston.format.printf(
+            (info) => `${info.timestamp} ${info.level}: ${info.message}`,
+        ),
     ),
-    transports: [new winston.transports.Console({
-        format: simple(),
-        level: Environment.getConfig().logger.console.level,
-    })],
+    transports: [
+        new winston.transports.Console({
+            // format: simple(),
+            level: Environment.getConfig().logger.console.level,
+        })
+    ],
     exitOnError: false
 });
 

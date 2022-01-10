@@ -14,7 +14,7 @@ const createServer = async () => {
     try {
         if (!httpServer) {
             let url = `🚀 Server ready at http://127.0.0.1:${serverPort}`;
-            const app = createServerApp();
+            const app = await createServerApp();
             httpServer = http.createServer(app);
             if (startApollo) {
                 const { schema, accountsGraphQL } = await createSchema();

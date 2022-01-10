@@ -1,5 +1,5 @@
 const { body } = require('express-validator');
-const {AuthUser} = require("../../../models");
+const {AuthUser} = require("../../models");
 
 const validateSignUp = [
     body('email')

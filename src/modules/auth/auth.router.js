@@ -5,7 +5,7 @@ const {
     validateSignIn,
     validateEmail,
     validateRefreshToken
-} = require("./validate");
+} = require("./auth.validate");
 
 const {
     signUp,
@@ -14,7 +14,7 @@ const {
     resendVerifyEmail,
     getToken,
     makeOAuthUser
-} = require("./controller")
+} = require("./auth.controller")
 
 router.post("/signup", validateSignUp, signUp);
 

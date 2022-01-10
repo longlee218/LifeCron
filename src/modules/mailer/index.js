@@ -33,7 +33,8 @@ const sendMailVerify = async (email, link) => {
                 <p>Thank you!</p>
         `
     }
-    return await sendMail(options);
+    await sendMail(options);
+    return `System sent verify e-mail to address: ${email} and will expire after 1 hour. If you are not received, please click this button below.`
 }
 
 module.exports = {
