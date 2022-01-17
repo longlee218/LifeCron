@@ -1,19 +1,20 @@
 require("dotenv").config();
-const {server, Logger} = require("./modules/core");
 const mongoose = require("mongoose");
-const Environment = require("./modules/core/environment");
+const { server, database, logger } = require("./modules/core");
+const { createServer } = server;
+const { connectMongoDB } = database;
+const { Logger } = logger;
 
-const uri = Environment.getConfig().database.connection;
+const log = Logger("modules:core:db");
 
-mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}, async (error) => {
-    if (error) {
-        console.log("ERROR: ", error);
-    } else {
-        const log = Logger.Logger("mongodb");
-        log.info("Connect success at: " + uri)
-        await server.createServer()
-    }
-});
+connectMongoDB
+    .then((conn) => {
+        log.info('Connection to Database is successful')
+        return createServer();
+    })
+    .then(() => console.log("All db and server start success"))
+    .catch(err => console.log(err));
+
+
+
+

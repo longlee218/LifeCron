@@ -1,4 +1,5 @@
 module.exports = {
   server: require('./server'),
-  Logger: require('./logger')
+  database: require('./db'),
+  logger: require('./logger')
 };

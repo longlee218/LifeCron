@@ -1,0 +1,1 @@
+khi đáng ký tài khoản, tạo cùng với profile, nếu tính ko tính thanh toán thì tạo default

@@ -10,7 +10,8 @@ const startApollo = false;
 const serverPort = Environment.getConfig().server.port;
 
 const log = Logger("modules:core:server");
-const createServer = async () => {
+
+exports.createServer = async () => {
     try {
         if (!httpServer) {
             let url = `🚀 Server ready at http://127.0.0.1:${serverPort}`;
@@ -31,5 +32,3 @@ const createServer = async () => {
         log.error(err);
     }
 };
-
-module.exports = { createServer };

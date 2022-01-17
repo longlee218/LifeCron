@@ -1,8 +1,8 @@
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const passportConfig = require("./auth.config");
-const {ExtractJwt, Strategy} = require("passport-jwt");
-const {AuthUser, AuthToken} = require("../../models");
+const { ExtractJwt, Strategy } = require("passport-jwt");
+const { AuthUser, AuthToken } = require("../../models");
 
 
 const applyPassportStrategy = (passport) => {
@@ -11,12 +11,14 @@ const applyPassportStrategy = (passport) => {
     options.secretOrKey = passportConfig.secret;
     passport.use(
         new Strategy(options, (payload, done) => {
-            AuthUser.findOne({_id: payload._id, is_active: true}, (err, user) => {
+            AuthUser.findOne({ _id: payload._id, is_active: true }, (err, user) => {
                 if (err) {
                     return done(err, false);
                 }
                 if (user) {
-                    return done(null, payload.user);
+                    user.password = undefined;
+                    user.salt = undefined;
+                    return done(null, user);
                 }
                 return done(null, false);
             });
@@ -46,7 +48,7 @@ const makeAndStoreToken = async (infoInToken) => {
         f_user: infoInToken._id,
         expire_in: now.setSeconds(now.getSeconds() + passportConfig.expiresIn)
     });
-    return {accessToken, refreshToken};
+    return { accessToken, refreshToken };
 }
 
 const randomPassword = () => {
@@ -54,16 +56,16 @@ const randomPassword = () => {
 }
 
 const makeOAuthUser = async (user) => {
-    const authUser = await AuthUser.findOne({email: user.email});
+    const authUser = await AuthUser.findOne({ email: user.email });
     if (authUser) {
         const infoInToken = {
             _id: authUser._id,
             email: authUser.email,
         };
-        const {accessToken, refreshToken} = await makeAndStoreToken(infoInToken);
-        return {user, accessToken, refreshToken};
+        const { accessToken, refreshToken } = await makeAndStoreToken(infoInToken);
+        return { user, accessToken, refreshToken };
     } else {
-        const {salt, passwordHash} = await AuthUser.setPassword(crypto.randomBytes(20).toString('hex'));
+        const { salt, passwordHash } = await AuthUser.setPassword(crypto.randomBytes(20).toString('hex'));
         const newUser = await AuthUser.create({
             username: user.displayName,
             email: user.email,
@@ -79,8 +81,8 @@ const makeOAuthUser = async (user) => {
         };
 
         //Generate token
-        const {accessToken, refreshToken} = await makeAndStoreToken(infoInToken)
-        return {user, accessToken, refreshToken};
+        const { accessToken, refreshToken } = await makeAndStoreToken(infoInToken)
+        return { user, accessToken, refreshToken };
     }
 }
 

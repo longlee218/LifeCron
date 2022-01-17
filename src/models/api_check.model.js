@@ -1,14 +1,17 @@
 const mongoose = require("mongoose");
+const slugify = require("slugify");
 const Schema = mongoose.Schema;
-const {String, Date, ObjectId, Number, Boolean} = Schema.Types;
+const { String, Date, ObjectId, Number, Boolean } = Schema.Types;
+
+const setNameSlug = (name) => slugify(name);
 
 const apiCheckSchema = new Schema({
-    name: {type: String, maxLength: 100},
-    slug: {type: String, maxLength: 100},
-    tags: [{type: String, maxLength: 20}],
+    name: { type: String, maxLength: 100 },
+    slug: { type: String, maxLength: 100, set: setNameSlug },
+    tags: [{ type: String, maxLength: 20 }],
     desc: String,
     f_project: {
-        type: ObjectId, ref: "account_project", required: true
+        type: ObjectId, ref: "account_projects", required: true
     },
     kind: {
         type: String, maxLength: 10, enum: ["simple", "cron"], default: "simple"
@@ -53,6 +56,7 @@ const apiCheckSchema = new Schema({
     status: {
         type: String, enum: ["up", "down", "new", "pause"], default: "new", required: true
     }
-}, {timestamps: {createdAt: true, updatedAt: true}});
+}, { timestamps: { createdAt: true, updatedAt: true } });
 
-module.exports = mongoose.model("api_check", apiCheckSchema);
+
+module.exports = mongoose.model("api_checks", apiCheckSchema);

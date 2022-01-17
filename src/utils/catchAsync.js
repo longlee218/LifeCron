@@ -1,5 +1,5 @@
-const {resServerError} = require("./response");
-const {validationResult} = require("express-validator");
+const { resServerError } = require("./response");
+const { validationResult } = require("express-validator");
 
 exports.catchAsync = (fn) => {
     return (req, res, next) => {
@@ -7,6 +7,9 @@ exports.catchAsync = (fn) => {
         if (!errors.isEmpty()) {
             return resServerError(res, 422, "validate fail", errors.mapped());
         }
-        fn(req, res, next).catch(error => next(error))
+        fn(req, res, next).catch(error => {
+            // res.status(error.status).json(error);
+            next(error);
+        })
     }
 }

@@ -1,5 +1,8 @@
 const nodemailer = require('nodemailer');
 
+const prefixAPI = process.env.API_PREFIX || "/api/v1/";
+const port = process.env.PORT || 3000;
+
 const transporter = nodemailer.createTransport({
     pool: true,
     host: 'smtp.gmail.com',
@@ -12,7 +15,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-const sendMail = async ({to, subject, html, text}) => {
+const sendMail = async ({ to, subject, html, text }) => {
     return await transporter.sendMail({
         from: process.env.APP_NAME,
         to: to,
@@ -22,10 +25,12 @@ const sendMail = async ({to, subject, html, text}) => {
     });
 };
 
-const sendMailVerify = async (email, link) => {
+const sendMailVerify = async (req, email, accessToken) => {
+    const host = req.hostname;
+    const link = "http://" + host + ":" + port + prefixAPI + "verify" + "/" + email + "/" + accessToken;
     const options = {
         to: email,
-        subject: "Account Verification Link",
+        subject: "Account Verification Link Emitter",
         text: `Hello ,\nPlease verify your account by clicking this link: \n${link}\nThank you!`,
         html: `
                 <p>Hello ,</p>
