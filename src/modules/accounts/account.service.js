@@ -1,3 +1,4 @@
+const uuid = require("uuid");
 const {
     AccountProject,
     ApiCheck,
@@ -11,7 +12,7 @@ exports.createAccount = async (user, timeZone = null, isWithProject = false) => 
             // Create project
             const project = await AccountProject.create({
                 f_user: user._id,
-                badge_key: user.username
+                badge_key: uuid.v4(),
             })
 
             // Create check

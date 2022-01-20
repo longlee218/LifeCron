@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const { String, Date, ObjectId, Number, Boolean } = Schema.Types;
+const { String, Date, ObjectId, Boolean } = Schema.Types;
+
+
+const enumKind = [
+    "webhook", "email", "zalo", "trello", "slack", "discord", "messenger", "mcsteam"
+]
 
 const apiChannelSchema = new Schema({
     name: {
@@ -11,7 +16,7 @@ const apiChannelSchema = new Schema({
     },
     kind: {
         type: String,
-        enum: ["webhook", "email", "zalo", "trello", "slack", "discord", "messenger", "mcsteam"],
+        enum: enumKind,
         default: "email",
         required: true
     },
@@ -24,6 +29,11 @@ const apiChannelSchema = new Schema({
     f_checks: [{
         type: ObjectId, ref: "api_checks", required: true
     }]
-}, { timestamps: { createdAt: true, updatedAt: true } });
+}, {
+    timestamps: {
+        createdAt: true,
+        updatedAt: true
+    }
+});
 
 module.exports = mongoose.model("api_channels", apiChannelSchema);

@@ -2,7 +2,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const passportConfig = require("./auth.config");
 const { ExtractJwt, Strategy } = require("passport-jwt");
-const { AuthUser, AuthToken } = require("../../models");
+const { AuthUser, AuthToken, AccountProfile } = require("../../models");
 
 
 const applyPassportStrategy = (passport) => {
@@ -10,18 +10,19 @@ const applyPassportStrategy = (passport) => {
     options.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
     options.secretOrKey = passportConfig.secret;
     passport.use(
-        new Strategy(options, (payload, done) => {
-            AuthUser.findOne({ _id: payload._id, is_active: true }, (err, user) => {
-                if (err) {
-                    return done(err, false);
-                }
+        new Strategy(options, async (payload, done) => {
+            try {
+                const user = await AuthUser.findOne({ _id: payload._id, is_active: true });
                 if (user) {
                     user.password = undefined;
                     user.salt = undefined;
-                    return done(null, user);
+                    const profile = await AccountProfile.findOne({ f_user: user._id });
+                    return done(null, user, profile);
                 }
                 return done(null, false);
-            });
+            } catch (err) {
+                return done(err, false);
+            }
         })
     );
 };

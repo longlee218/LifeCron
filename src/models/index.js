@@ -5,3 +5,4 @@ exports.ApiChannel = require("./api_channel.model");
 exports.AccountProfile = require("./account_profile.model");
 exports.AccountProject = require("./account_project.model");
 exports.AccountCredential = require("./account_credential.model");
+exports.AccountMember = require("./account_member.model");

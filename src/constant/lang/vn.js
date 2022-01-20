@@ -16,6 +16,8 @@ const vn = {
         },
         server: {
             some_thing_wrong: 'Đã có lỗi xảy ra, vui lòng thử lại.',
+            not_found: "Không tìm thấy dữ liệu.",
+            permission_denied: "Không có quyền truy cập."
         },
     },
     success: {

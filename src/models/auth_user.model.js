@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const { String, Boolean, Date } = Schema.Types;
-const { AccountCredential } = require('./index');
+const { AccountProfile } = require('./index');
 
 const authUserSchema = new Schema({
     username: {

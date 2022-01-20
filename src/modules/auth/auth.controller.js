@@ -77,6 +77,9 @@ exports.signIn = catchAsync(async (req, res, next) => {
     });
 })
 
+exports.signInOpt = catchAsync(async (req, res, next) => {
+
+})
 
 exports.verifyEmail = catchAsync(async (req, res, next) => {
     const { email, token } = req.params;
