@@ -24,12 +24,16 @@ exports.createAccount = async (user, timeZone = null, isWithProject = false) => 
             });
 
             // Create channel
-            await ApiChannel.create({
+            const channel = await ApiChannel.create({
                 f_project: project._id,
                 kind: "email",
                 value: user.email,
                 email_verified: false,
                 $push: { f_checks: check._id }
+            });
+
+            await check.updateOne({
+                $push: { f_channels: channel._id }
             });
         }
         const profile = new AccountProfile();

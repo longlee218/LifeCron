@@ -20,7 +20,7 @@ exports.getProjectForUser = async (codeProject, user) => {
     if (!accountMember) {
         throw new Error(langVN.error.server.not_found);
     }
-    const isReadOrMember = accountMember.isReadOrMember();
+    const isReadOrMember = await accountMember.isReadOrMember();
     return { project, canSee: isReadOrMember };
 }
 
@@ -31,3 +31,25 @@ exports.refreshActiveDate = async (profile) => {
         await profile.save();
     }
 }
+
+exports.getTagStatuses = async (checks) => {
+    const tags = {};
+    const down = {};
+    const grace = {};
+    const numDown = 0;
+
+    checks.forEach(check => {
+        const status = await check.getStatus();
+
+        switch (status) {
+            case "down":
+                numDown += 1;
+                break;
+            case "grace":
+                numDown += 1;
+                break;
+            default:
+                break;
+        }
+    });
+} 

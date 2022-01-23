@@ -5,7 +5,7 @@ const { ExtractJwt, Strategy } = require("passport-jwt");
 const { AuthUser, AuthToken, AccountProfile } = require("../../models");
 
 
-const applyPassportStrategy = (passport) => {
+exports.applyPassportStrategy = (passport) => {
     const options = {};
     options.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
     options.secretOrKey = passportConfig.secret;
@@ -27,21 +27,21 @@ const applyPassportStrategy = (passport) => {
     );
 };
 
-const makeAccessToken = (infoInToken) => {
+const _makeAccessToken = (infoInToken) => {
     return jwt.sign(infoInToken, passportConfig.secret, {
         expiresIn: passportConfig.expiresIn,
     })
 }
 
-const makeRefreshToken = (infoInToken) => {
+const _makeRefreshToken = (infoInToken) => {
     return jwt.sign(infoInToken, passportConfig.secretRefresh, {
         expiresIn: passportConfig.expiresInRefresh,
     })
 }
 
-const makeAndStoreToken = async (infoInToken) => {
-    const accessToken = makeAccessToken(infoInToken);
-    const refreshToken = makeRefreshToken(infoInToken);
+exports.makeAndStoreToken = async (infoInToken) => {
+    const accessToken = _makeAccessToken(infoInToken);
+    const refreshToken = _makeRefreshToken(infoInToken);
     const now = new Date();
     await AuthToken.create({
         access_token: accessToken,
@@ -52,11 +52,11 @@ const makeAndStoreToken = async (infoInToken) => {
     return { accessToken, refreshToken };
 }
 
-const randomPassword = () => {
+exports.randomPassword = () => {
     return crypto.randomBytes(20).toString('hex')
 }
 
-const makeOAuthUser = async (user) => {
+exports.makeOAuthUser = async (user) => {
     const authUser = await AuthUser.findOne({ email: user.email });
     if (authUser) {
         const infoInToken = {
@@ -82,16 +82,7 @@ const makeOAuthUser = async (user) => {
         };
 
         //Generate token
-        const { accessToken, refreshToken } = await makeAndStoreToken(infoInToken)
-        return { user, accessToken, refreshToken };
+        const accessAndRefresh = await makeAndStoreToken(infoInToken);
+        return { user, ...accessAndRefresh };
     }
-}
-
-module.exports = {
-    applyPassportStrategy,
-    makeAccessToken,
-    makeRefreshToken,
-    makeAndStoreToken,
-    randomPassword,
-    makeOAuthUser
 }
